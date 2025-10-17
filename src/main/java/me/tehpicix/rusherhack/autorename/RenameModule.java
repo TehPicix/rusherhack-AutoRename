@@ -1,14 +1,4 @@
-package org.icetank;
-
-import org.rusherhack.client.api.events.client.EventUpdate;
-import org.rusherhack.client.api.feature.module.ModuleCategory;
-import org.rusherhack.client.api.feature.module.ToggleableModule;
-import org.rusherhack.client.api.utils.ChatUtils;
-import org.rusherhack.client.api.utils.InventoryUtils;
-import org.rusherhack.core.event.subscribe.Subscribe;
-import org.rusherhack.core.setting.BooleanSetting;
-import org.rusherhack.core.setting.NumberSetting;
-import org.rusherhack.core.setting.StringSetting;
+package me.tehpicix.rusherhack.autorename;
 
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
@@ -20,31 +10,39 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import org.rusherhack.client.api.events.client.EventUpdate;
+import org.rusherhack.client.api.feature.module.ModuleCategory;
+import org.rusherhack.client.api.feature.module.ToggleableModule;
+import org.rusherhack.client.api.utils.ChatUtils;
+import org.rusherhack.client.api.utils.InventoryUtils;
+import org.rusherhack.core.event.subscribe.Subscribe;
+import org.rusherhack.core.setting.BooleanSetting;
+import org.rusherhack.core.setting.NumberSetting;
+import org.rusherhack.core.setting.StringSetting;
 
-public class AutoAnvilRenameModule extends ToggleableModule {
+public class RenameModule extends ToggleableModule {
 	private final StringSetting renameText = new StringSetting("RenameText", "Sponsored by RusherHack Plugins");
 	private final BooleanSetting selectiveMode = new BooleanSetting("Selective", false);
 	private final StringSetting selectiveId = new StringSetting("ItemId", "end_crystal").setVisibility(this.selectiveMode::getValue);
 	private final BooleanSetting onlyShulkers = new BooleanSetting("OnlyShulkers", false)
-			.setVisibility(() -> !(this.selectiveMode.getValue()));
+	                                                .setVisibility(() -> !(this.selectiveMode.getValue()));
 	private final BooleanSetting onlyRenamed = new BooleanSetting("OnlyRenamed", false);
 	private final NumberSetting<Integer> clickDelay = new NumberSetting<>("Click Delay", 1, 3, 10);
 	private final BooleanSetting autoXP = new BooleanSetting("AutoXP", false);
 	private int delay = 0;
 
-	public AutoAnvilRenameModule() {
-		super("AutoAnvilRename", "Renames items in an anvil automatically", ModuleCategory.CLIENT);
-		
+	public RenameModule() {
+		super("AutoRename", "Renames items in an anvil automatically", ModuleCategory.CLIENT);
+
 		//register settings
 		this.registerSettings(
-				this.renameText,
-				this.selectiveMode,
-				this.selectiveId,
-				this.onlyShulkers,
-				this.onlyRenamed,
-				this.clickDelay,
-				this.autoXP
-		);
+		    this.renameText,
+		    this.selectiveMode,
+		    this.selectiveId,
+		    this.onlyShulkers,
+		    this.onlyRenamed,
+		    this.clickDelay,
+		    this.autoXP);
 	}
 
 	@Subscribe
@@ -55,15 +53,13 @@ public class AutoAnvilRenameModule extends ToggleableModule {
 		if (delay == 1) tick();
 		delay++;
 	}
-	
+
 	@Override
 	public void onEnable() {
-
 	}
-	
+
 	@Override
 	public void onDisable() {
-
 	}
 
 	void tick() {
@@ -81,7 +77,7 @@ public class AutoAnvilRenameModule extends ToggleableModule {
 		// Check if there is an output
 		if (!itemStackOutput.isEmpty()) {
 
-			int cost = ((AnvilMenu) mc.player.containerMenu).getCost();
+			int cost = ((AnvilMenu)mc.player.containerMenu).getCost();
 
 			// Check if name matches the renameText option with an edge case for empty name values which remove the name.
 			if (outputItemName.equals(renameText.getValue()) || (renameText.getValue().equals("") && itemStackOutput.getItemName().equals(itemStackOutput.getHoverName()))) {
@@ -110,7 +106,7 @@ public class AutoAnvilRenameModule extends ToggleableModule {
 
 		// Set the name of the item in the anvil if present
 		if (!itemStackInput1.isEmpty() && !outputItemName.equals(renameText.getValue())) {
-			EditBox editBox = AnvilScreenAccessInvoker.getEditBox(((AnvilScreen) mc.screen));
+			EditBox editBox = AnvilScreenAccessInvoker.getEditBox(((AnvilScreen)mc.screen));
 			if (editBox != null) editBox.setValue(renameText.getValue());
 			return;
 		}
@@ -143,7 +139,7 @@ public class AutoAnvilRenameModule extends ToggleableModule {
 	}
 
 	public static boolean isShulker(ItemStack itemStack) {
-		return itemStack.getItem() instanceof BlockItem && ((BlockItem) itemStack.getItem()).getBlock() instanceof ShulkerBoxBlock;
+		return itemStack.getItem() instanceof BlockItem && ((BlockItem)itemStack.getItem()).getBlock() instanceof ShulkerBoxBlock;
 	}
 
 	public static String removeBrackets(String str) {

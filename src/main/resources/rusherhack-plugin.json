@@ -1,8 +1,8 @@
 {
-  "Plugin-Class": "org.icetank.AutoAnvilRenamePlugin",
-  "Name": "AutoAnvilRename",
+  "Plugin-Class": "${project.maven_group}.Main",
+  "Name": "${project.plugin_name}",
   "Version": "${project.plugin_version}",
-  "Description": "",
+  "Description": "Automatic anvil renaming module for RusherHack",
   "Authors": [
     "icetank",
     "_90_",

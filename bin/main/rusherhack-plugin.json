@@ -1,6 +1,6 @@
 {
   "Plugin-Class": "org.icetank.AutoAnvilRenamePlugin",
-  "Name": "AutoAnvilRename",
+  "Name": "AutoRename",
   "Version": "${project.plugin_version}",
   "Description": "",
   "Authors": [

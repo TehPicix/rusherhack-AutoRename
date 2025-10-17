@@ -5,9 +5,8 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.plugin_version
 group = project.maven_group
-archivesBaseName = project.plugin_id
+archivesBaseName = project.plugin_name
 
 configurations {
 	rusherhackApi
@@ -20,19 +19,10 @@ configurations {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-
 	maven {
 		name = "rusherhack"
-		//releases repository will have the latest api version for last stable rusherhack release
-		//snapshots will always be the latest api version
-		//url = "https://maven.rusherhack.org/releases"
 		url = "https://maven.rusherhack.org/snapshots"
 	}
-
 	maven {
 		name = 'ParchmentMC'
 		url = 'https://maven.parchmentmc.org'
@@ -43,14 +33,10 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	productionRuntime(modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}"))
 	productionRuntime("net.fabricmc:intermediary:${project.minecraft_version}")
-
-	//mojmap + parchment mappings
 	mappings loom.layered() {
 		officialMojangMappings()
 		parchment("org.parchmentmc.data:parchment-${project.parchment_version}@zip")
 	}
-
-	//rusherhack api
 	rusherhackApi "org.rusherhack:rusherhack-api:$minecraft_version-SNAPSHOT"
 }
 
@@ -117,11 +103,6 @@ loom {
 	runConfigs.configureEach {
 		ideConfigGenerated = false
 	}
-	
-	mixin {
-		//defaultRefmapName = "mixins.${this.project.plugin_name}-refmap.json"
-		useLegacyMixinAp = false
-	}
 }
 
 def targetJavaVersion = project.java_version
@@ -131,10 +112,6 @@ java.targetCompatibility = JavaLanguageVersion.of(targetJavaVersion)
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
 
 tasks.withType(JavaCompile).configureEach {
-	// ensure that the encoding is set to UTF-8, no matter what the system default is
-	// this fixes some edge cases with special characters not displaying correctly
-	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-	// If Javadoc is generated, this must be specified in that task too.
 	it.options.encoding = "UTF-8"
 	it.options.release = Integer.parseInt(targetJavaVersion)
 }
@@ -153,6 +130,22 @@ jar {
 	}
 }
 
-//update access widener during intellij sync
+
+def libsDir = layout.buildDirectory.dir("libs")
+
+tasks.register("devJar", Copy) {
+    group = "build"
+    description = "Create an additional jar named <archivesBaseName>-dev.jar with identical contents to remapJar"
+    dependsOn tasks.named("remapJar")
+    from(tasks.named("remapJar").flatMap { it.archiveFile })
+    into(libsDir)
+    rename { _ -> "${project.archivesBaseName}-${project.plugin_version}.jar" }
+}
+
 this.tasks.ideaSyncTask.dependsOn("updateAccessWidener")
 this.tasks.configureLaunch.dependsOn("updateAccessWidener")
+
+this.tasks.build.dependsOn("devJar")
+// tasks.named("build") {
+//     dependsOn("devJar")
+// }
